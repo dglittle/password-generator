@@ -1,4 +1,5 @@
 password-generator
 ==================
 
-generate a password
+[try it here](http://dglittle.github.com/password-generator)
+
