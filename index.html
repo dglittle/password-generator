@@ -133,26 +133,24 @@ function getTime()
 	str = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + ":" + d.getMilliseconds();
 	return str;
 }
-function makeArray()
+function makeArray(arr)
 {
 //	symbol = 33 ~ 47, 58 ~ 64, 91 ~ 96, 123 ~ 126
 //	number = 48 ~ 57
 //	lowercase = 97 ~ 122
 //	uppercase = 65 ~ 90
-	legalArr = new Array(
-	'abcdefghijklmnopqrstuvwxyz' ,
-	'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ,
-	'0123456789' ,
-	'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-	);
-
-	arr = new Array('lowercase', 'UPPERCASE', 'numbers', 'symbols');
+	legal = {
+		lowercase: 'abcdefghijklmnopqrstuvwxyz' ,
+		UPPERCASE: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ,
+		numbers  : '0123456789' ,
+		symbols  : '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+	};
+	//arr = new Array('lowercase', 'UPPERCASE', 'numbers', 'symbols');
 	ss = "";
-	for (i = 0; i < 4; i++)
-	{	
-		if (document.getElementById(arr[i]).checked)
-		{
-			ss += legalArr[i];
+	for (i = 0; i < arr.length; i++)
+	{
+		if (legal.hasOwnProperty(arr[i])) {
+			ss += legal[arr[i]];
 		}
 	}
 	return ss;
@@ -171,26 +169,41 @@ document.onmousemove = function(e){
 }
 function generate()
 {
-	s = document.getElementById("randomness").value;
+	var s = document.getElementById("randomness").value;
 	
-	s = SHA256(s);
-	legalStr = makeArray();
-	if (legalStr == "")
-	{
-		alert("Check one or more options!!!");
-		return;
+	var s = SHA256(s);
+	//'lowercase', 'UPPERCASE', 'numbers', 'symbols'
+	var legalStrLower = makeArray(['lowercase']);
+	var legalStrUpper = makeArray(['lowercase', 'UPPERCASE']);
+	var legalStrNumber = makeArray(['lowercase', 'UPPERCASE', 'numbers']);
+	var legalStrSymbols = makeArray(['lowercase', 'UPPERCASE', 'numbers', 'symbols']);
+	var lowerPasswd   = "";
+	var upperPasswd   = "";
+	var numPasswd     = "";
+	var symbolsPasswd = "";
+
+	var decodeChar = function(c, legalStr) {
+		var c = legalStr.charAt(val % legalStr.length);
+		return c;
 	}
-	str = "";
 	
 	for (i = 0; i < s.length + 1; i = i + 2)
-	{		
-		
-		val = parseInt(s.substring(i, i + 2), 16);
+	{
+		var val = parseInt(s.substring(i, i + 2), 16);
 		if (isNaN(val)) continue;
-		c = legalStr.charAt(val % legalStr.length);
-		str += c;
+		lowerPasswd += decodeChar(s, legalStrLower);
+		upperPasswd += decodeChar(s, legalStrUpper);
+		numPasswd += decodeChar(s, legalStrNumber);
+		symbolsPasswd += decodeChar(s, legalStrSymbols);
 	}
-	document.getElementById("passwd").value = str;
+	if (!/[A-Z]/.test(upperPasswd) || !(/[A-Z]/.test(numPasswd) && /[0-9]/.test(numPasswd)) || !(/[A-Z]/.test(symbolsPasswd) && /[0-9]/.test(symbolsPasswd) && /\W/.test(symbolsPasswd))) {
+		generate();
+		return;
+	}
+	document.getElementById("lowercase_passwd").value = lowerPasswd;
+	document.getElementById("uppercase_passwd").value = upperPasswd;
+	document.getElementById("numbers_passwd").value = numPasswd;
+	document.getElementById("symbols_passwd").value = symbolsPasswd;
 	//alert(str);
 }
 </script>
@@ -203,13 +216,13 @@ function generate()
 
 <form id="form1" >
 <br/>
-<label><input type="checkbox" id="lowercase" checked="checked" /> lowercase</label>
+<label>lowercase <input type="text" id="lowercase_passwd" /></label>
 <br/>
-<label><input type="checkbox" id="UPPERCASE" checked="checked" /> UPPERCASE</label>
+<label>UPPERCASE <input type="text" id="uppercase_passwd" /></label>
 <br/>
-<label><input type="checkbox" id="numbers" checked="checked" /> num6ers</label>
+<label>num6ers <input type="text" id="numbers_passwd" /></label>
 <br/>
-<label><input type="checkbox" id="symbols" checked="checked" /> $y^^bo)$</label>
+<label>$y^^bo)$ <input type="text" id="symbols_passwd" /></label>
 <br/>
 <label><input type="button" value="generate" onclick="generate()" /></label>
 <br/>
