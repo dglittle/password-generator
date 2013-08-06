@@ -169,6 +169,7 @@ document.onmousemove = function(e){
 }
 function generate()
 {
+	document.getElementById("randomness").value += Math.random(); // ensure that we update randomness even if not moving mouse
 	var s = document.getElementById("randomness").value;
 	
 	var s = SHA256(s);
@@ -188,7 +189,7 @@ function generate()
 		return c;
 	}
 	
-	for (i = 0; i < s.length + 1; i = i + 2)
+	for (i = 0; i < s.length; i = i + 2)
 	{
 		var val = parseInt(s.substring(i, i + 2), 16);
 		if (isNaN(val)) continue;
@@ -197,15 +198,26 @@ function generate()
 		numPasswd += decodeChar(s, legalStrNumber);
 		symbolsPasswd += decodeChar(s, legalStrSymbols);
 	}
-	if (!/[A-Z]/.test(upperPasswd) || !(/[A-Z]/.test(numPasswd) && /[0-9]/.test(numPasswd)) || !(/[A-Z]/.test(symbolsPasswd) && /[0-9]/.test(symbolsPasswd) && /\W/.test(symbolsPasswd))) {
+	if (!/[A-Z]/.test(upperPasswd) || 
+		!(/[A-Z]/.test(numPasswd) && /[0-9]/.test(numPasswd)) || 
+		!(/[A-Z]/.test(symbolsPasswd) && /[0-9]/.test(symbolsPasswd) && /\W/.test(symbolsPasswd))) {
+		document.getElementById("randomness").value += Math.random();
 		generate();
 		return;
 	}
 	var commonWordsLength = words.length;
+	var bits = commonWordsLength.toString().length;
 	var phraseLength = 4;
 	while(phraseLength--) {
-		var index = Math.floor(Math.random() * (commonWordsLength + 1));
-		xkcdPasswd += words[index];
+		var calcVal = function() {
+			var val = parseInt(s.substring(phraseLength, phraseLength + bits), 16);
+			if (isNaN(val)) {
+				val = calcIndex();
+			}
+			return val;
+		};
+		
+		xkcdPasswd += words[calcVal() % commonWordsLength];
 		if (phraseLength !== 0) {
 			xkcdPasswd += ' ';
 		}
@@ -227,19 +239,33 @@ function generate()
 
 <form id="form1" >
 <br/>
-<label>lowercase <input type="text" id="lowercase_passwd" /></label>
-<br/>
-<label>UPPERCASE <input type="text" id="uppercase_passwd" /></label>
-<br/>
-<label>num6ers <input type="text" id="numbers_passwd" /></label>
-<br/>
-<label>$y^^bo)$ <input type="text" id="symbols_passwd" /></label>
-<br/>
-<label>xkcd <input type="text" id="xkcd_passwd" /></label>
-<br/>
-<label><input type="button" value="generate" onclick="generate()" /></label>
-<br/>
-<input type="textbox" id="passwd" style="width:700px"/>
+<table>
+	<tr>
+		<td>lowercase</td>
+		<td><input type="text" id="lowercase_passwd" size="40" /></td>
+	</tr>
+	<tr>
+		<td>UPPERCASE</td>
+		<td><input type="text" id="uppercase_passwd" size="40" /></td>
+	</tr>
+	<tr>
+		<td>num6ers</td>
+		<td><input type="text" id="numbers_passwd" size="40" /></td>
+	</tr>
+	<tr>
+		<td>$y^^bo)$</td>
+		<td><input type="text" id="symbols_passwd" size="40" /></td>
+	</tr>
+	<tr>
+		<td>xkcd</td>
+		<td><input type="text" id="xkcd_passwd" size="40" /></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<input type="button" value="generate" onclick="generate()" />
+		</td>
+	</tr>
+</table>
 <br/>
 <textarea id="randomness" readonly style="width:700px; height:500px; vertical-align:text-top;"></textarea>
 <br/>
@@ -525,8 +551,8 @@ var words = ['aardvark',
 	'bronze',
 	'brother',
 	'brother',
-	-'in',
-	-'law',
+	'in',
+	'law',
 	'brow',
 	'brown',
 	'brush',
@@ -611,7 +637,7 @@ var words = ['aardvark',
 	'caution',
 	'cave',
 	'c',
-	-'clamp',
+	'clamp',
 	'cd',
 	'ceiling',
 	'celery',
@@ -1004,14 +1030,14 @@ var words = ['aardvark',
 	'exclamation',
 	'exhaust',
 	'ex',
-	-'husband',
+	'husband',
 	'existence',
 	'expansion',
 	'experience',
 	'expert',
 	'explanation',
 	'ex',
-	-'wife',
+	'wife',
 	'eye',
 	'eyebrow',
 	'eyelash',
@@ -1030,9 +1056,6 @@ var words = ['aardvark',
 	'farmer',
 	'fat',
 	'father',
-	'father',
-	-'in',
-	-'law',
 	'faucet',
 	'fear',
 	'feast',
@@ -1172,11 +1195,7 @@ var words = ['aardvark',
 	'golf',
 	'gondola',
 	'gong',
-	'good',
-	-'bye',
 	'goose',
-	'gore',
-	-'tex',
 	'gorilla',
 	'gosling',
 	'government',
@@ -1194,10 +1213,6 @@ var words = ['aardvark',
 	'grasshopper',
 	'gray',
 	'grease',
-	'great',
-	-'grandfather',
-	'great',
-	-'grandmother',
 	'greece',
 	'greek',
 	'green',
@@ -1222,10 +1237,6 @@ var words = ['aardvark',
 	'hail',
 	'hair',
 	'haircut',
-	'half',
-	-'brother',
-	'half',
-	-'sister',
 	'halibut',
 	'hall',
 	'hallway',
@@ -1575,8 +1586,6 @@ var words = ['aardvark',
 	'mind',
 	'mine',
 	'minibus',
-	'mini',
-	-'skirt',
 	'minister',
 	'mint',
 	'minute',
@@ -1599,9 +1608,6 @@ var words = ['aardvark',
 	'mosque',
 	'mosquito',
 	'mother',
-	'mother',
-	-'in',
-	-'law',
 	'motion',
 	'motorboat',
 	'motorcycle',
@@ -1610,8 +1616,6 @@ var words = ['aardvark',
 	'moustache',
 	'mouth',
 	'move',
-	'multi',
-	-'hop',
 	'multimedia',
 	'muscle',
 	'museum',
@@ -1770,9 +1774,6 @@ var words = ['aardvark',
 	'pedestrian',
 	'pediatrician',
 	'peen',
-	'peer',
-	-'to',
-	-'peer',
 	'pelican',
 	'pen',
 	'penalty',
@@ -2143,9 +2144,6 @@ var words = ['aardvark',
 	'single',
 	'sink',
 	'sister',
-	'sister',
-	-'in',
-	-'law',
 	'size',
 	'skate',
 	'skiing',
@@ -2244,29 +2242,6 @@ var words = ['aardvark',
 	'steel',
 	'stem',
 	'step',
-	'step',
-	-'aunt',
-	'step',
-	-'brother',
-	'stepdaughter',
-	'step',
-	-'daughter',
-	'step',
-	-'father',
-	'step',
-	-'grandfather',
-	'step',
-	-'grandmother',
-	'stepmother',
-	'step',
-	-'mother',
-	'step',
-	-'sister',
-	'stepson',
-	'step',
-	-'son',
-	'step',
-	-'uncle',
 	'steven',
 	'stew',
 	'stick',
@@ -2412,8 +2387,6 @@ var words = ['aardvark',
 	'toenail',
 	'toilet',
 	'tomato',
-	'tom',
-	-'tom',
 	'ton',
 	'tongue',
 	'tooth',
@@ -2453,8 +2426,6 @@ var words = ['aardvark',
 	'truck',
 	'trumpet',
 	'trunk',
-	't',
-	-'shirt',
 	'tsunami',
 	'tub',
 	'tuba',
