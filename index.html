@@ -156,9 +156,14 @@ function makeArray(arr)
 	return ss;
 }
 
+function getRandom() {
+	var random = Math.random();
+	document.getElementById("randomness").value += "Current time is " + getTime() +"\n" + "Math random says: " + random;	
+}
+
 function load()
-{	random = Math.random();
-	document.getElementById("randomness").value = "Current time is " + getTime() +"\n" + "Math random says: " + random;	
+{	
+	getRandom();
 }
 
 var cursorX;
@@ -169,7 +174,7 @@ document.onmousemove = function(e){
 }
 function generate()
 {
-	document.getElementById("randomness").value += Math.random(); // ensure that we update randomness even if not moving mouse
+	getRandom(); // ensure that we update randomness even if not moving mouse
 	var s = document.getElementById("randomness").value;
 	
 	var s = SHA256(s);
@@ -201,7 +206,7 @@ function generate()
 	if (!/[A-Z]/.test(upperPasswd) || 
 		!(/[A-Z]/.test(numPasswd) && /[0-9]/.test(numPasswd)) || 
 		!(/[A-Z]/.test(symbolsPasswd) && /[0-9]/.test(symbolsPasswd) && /\W/.test(symbolsPasswd))) {
-		document.getElementById("randomness").value += Math.random();
+		getRandom();
 		generate();
 		return;
 	}
@@ -209,10 +214,11 @@ function generate()
 	var bits = commonWordsLength.toString().length;
 	var phraseLength = 4;
 	while(phraseLength--) {
+		var pass = phraseLength * bits;
 		var calcVal = function() {
-			var val = parseInt(s.substring(phraseLength, phraseLength + bits), 16);
+			var val = parseInt(s.substring(pass, pass + bits), 16);
 			if (isNaN(val)) {
-				val = calcIndex();
+				val = calcVal();
 			}
 			return val;
 		};
