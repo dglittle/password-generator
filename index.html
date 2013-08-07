@@ -215,15 +215,9 @@ function generate()
 	var phraseLength = 4;
 	while(phraseLength--) {
 		var pass = phraseLength * bits;
-		var calcVal = function() {
-			var val = parseInt(s.substring(pass, pass + bits), 16);
-			if (isNaN(val)) {
-				val = calcVal();
-			}
-			return val;
-		};
+		var val = parseInt(s.substring(pass, pass + bits), 16);
 		
-		xkcdPasswd += words[calcVal() % commonWordsLength];
+		xkcdPasswd += words[val % commonWordsLength];
 		if (phraseLength !== 0) {
 			xkcdPasswd += ' ';
 		}
