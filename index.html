@@ -168,6 +168,9 @@ function load()
 
 var cursorX;
 var cursorY;
+document.onkeypress = function (e) {
+    document.getElementById("randomness").value +="\nkeypress at time " + getTime();//MouseX is textbox
+}
 document.onmousemove = function(e){
     cursorX = e.pageX; cursorY=e.pageY;
     document.getElementById("randomness").value +="\nmouse moved to("+ cursorX + "," + cursorY+") at time " + getTime();//MouseX is textbox
